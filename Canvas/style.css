@@ -3,11 +3,12 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background-color: #e3dede;
+    background-color: #1e1e2e;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #cdd6f4;
 }
 
 .container {
@@ -17,14 +18,16 @@ body {
     max-width: 1050px;
     width: 100%;
     border-radius: 20px;
+    background-color: #181825;
 }
 
 .tools-board {
     width: 210px;
     height: 590px;
     border-radius: 20px;
-    background-color: #f8f7f6;
+    background-color: #313244;
     padding: 15px 22px 0;
+    color: #cdd6f4;
 }
 
 .tools-board .row {
@@ -48,13 +51,13 @@ body {
 }
 
 .option :where(span, label) {
-    color: black;
+    color: #cdd6f4;
     cursor: pointer;
     padding-left: 10px;
 }
 
 .option:is(:hover, .active) :where(span, label) {
-    color: #f4130b;
+    color: #f38ba8;
 }
 
 .option #fill-color {
@@ -64,7 +67,7 @@ body {
 }
 
 #fill-color:checked~label {
-    color: #e93e2b;
+    color: #f38ba8;
 }
 
 .option #size-slider {
@@ -87,24 +90,24 @@ body {
 }
 
 .colors .option:nth-child(1) {
-    background-color: #fff;
-    border: 1px solid #bfbfbf;
+    background-color: #f5e0dc;
+    border: 1px solid #cdd6f4;
 }
 
 .colors .option:nth-child(2) {
-    background-color: black;
+    background-color: #45475a;
 }
 
 .colors .option:nth-child(3) {
-    background-color: #ef4415;
+    background-color: #f38ba8;
 }
 
 .colors .option:nth-child(4) {
-    background-color: green;
+    background-color: #a6e3a1;
 }
 
 .colors .option:nth-child(5) {
-    background-color: #c1f40a;
+    background-color: #f9e2af;
 }
 
 .colors .option.selected::before {
@@ -116,12 +119,12 @@ body {
     width: 12px;
     background: inherit;
     border-radius: inherit;
-    border: 2px solid #fff;
+    border: 2px solid #cdd6f4;
     transform: translate(-50%, -50%);
 }
 
 .colors .option:first-child.selected::before {
-    border-color: #ccc;
+    border-color: #cba6f7;
 }
 
 .option #color-picker {
@@ -131,34 +134,20 @@ body {
 
 .buttons button {
     width: 80%;
-    color: #fff;
+    color: #cdd6f4;
     border: none;
     outline: none;
     font-size: 0.9rem;
     padding: 3px 0;
     margin-bottom: 13px;
-    background: none;
+    background: #585b70;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.buttons .clear-canvas {
-    color: black;
-    border: 1px solid #9fc39f;
-    transition: all 0.2s ease;
-    border: 2px solid black;
-    font-size: 13px;
-}
-
-.clear-canvas:hover {
-    color: #fff;
-    background: #6c757d;
-}
-
-.buttons .save-img {
-    background: white;
-    color: black;
-    border: 1px solid #6c757d;
+.buttons .clear-canvas:hover {
+    color: #f38ba8;
+    background: #6c7086;
 }
 
 .drawing-board {
@@ -169,5 +158,41 @@ body {
     width: 100%;
     height: 590px;
     border-radius: 10px;
+    background-color: #1e1e2e;
+}
+
+/* Mermaid Code Editor */
+.mermaid-editor {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #181825;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #cdd6f4;
+}
+
+.mermaid-editor textarea {
+    width: 100%;
+    height: 150px;
+    font-family: monospace;
+    font-size: 14px;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #585b70;
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+}
+
+.mermaid-preview {
+    width: 100%;
+    height: 300px;
+    border-radius: 5px;
+    background: #313244;
+    border: 1px solid #585b70;
+    overflow: auto;
+    padding: 10px;
+    color: #cdd6f4;
 }
 

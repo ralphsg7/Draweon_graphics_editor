@@ -1,117 +1,428 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, 
-                                   initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- font awesome icons -->
-    <link rel="stylesheet" href=
-"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-          integrity=
-"sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="script.js" defer></script>
-    <script src=
-"https://kit.fontawesome.com/c353d71a36.js" crossorigin="anonymous">
-      </script>
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing App with Mermaid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        .container {
+            display: flex;
+            height: 100vh;
+            background: #f0f2f5;
+        }
+
+        .tools-board {
+            width: 250px;
+            padding: 15px;
+            background: white;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+        }
+
+        .drawing-board {
+            flex: 1;
+            padding: 15px;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #ccc;
+            background: white;
+        }
+
+        .mermaid-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 20px auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        #mermaid-input {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+        }
+
+        #mermaid-output {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background: white;
+            min-height: 200px;
+        }
+
+        .tool {
+            cursor: pointer;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tool:hover {
+            background: #f0f0f0;
+        }
+
+        .colors .option {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .colors .option.selected {
+            border-color: #007bff;
+        }
+
+        #color-picker {
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .buttons {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin: 4px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        .fa-square {
+            transform: rotate(45deg);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
 <body>
     <div class="container">
+        <!-- Tools Board -->
         <section class="tools-board">
-
             <div class="row">
-                <label for="" class="title"><strong>Tools</strong></label>
+                <label class="title"><strong>Tools</strong></label>
                 <ul class="options">
                     <li class="option tool" id="pencil">
-                        <i class="fas fa-pencil" id="icon"></i>
+                        <i class="fas fa-pencil"></i>
                         <span>Pencil</span>
                     </li>
-                    <li class="option active tool" id="brush">
-                        <i class="fas fa-brush" id="icon"></i>
+                    <li class="option tool active" id="brush">
+                        <i class="fas fa-brush"></i>
                         <span>Brush</span>
                     </li>
                     <li class="option tool" id="eraser">
-                        <i class="fas fa-eraser" id="icon"></i>
+                        <i class="fas fa-eraser"></i>
                         <span>Eraser</span>
                     </li>
                     <li class="option">
-                        <input type="range" id="size-slider" min="1" 
-                               max="30" value="5">
+                        <input type="range" id="size-slider" min="1" max="30" value="5">
                     </li>
                 </ul>
             </div>
+            
             <div class="row colors">
-                <label for="" class="title">Colors</label>
+                <label class="title">Colors</label>
                 <ul class="options">
-                    <li class="option"></li>
-                    <li class="option selected"></li>
-                    <li class="option"></li>
-                    <li class="option"></li>
+                    <li class="option" style="background: #000"></li>
+                    <li class="option selected" style="background: #ff0000"></li>
+                    <li class="option" style="background: #00ff00"></li>
+                    <li class="option" style="background: #0000ff"></li>
                     <li class="option">
-                        <input type="color" value="#00FF00" name="" 
-                               id="color-picker">
+                        <input type="color" value="#00FF00" id="color-picker">
                     </li>
                 </ul>
             </div>
 
             <div class="row">
-                <label for="" class="title"> <strong>Shapes</strong></label>
+                <label class="title"><strong>Shapes</strong></label>
                 <ul class="options">
                     <li class="option tool" id="rectangle">
-                        <i class="fa-solid fa-dice-one"></i>
+                        <i class="fa-solid fa-square"></i>
                         <span>Rectangle</span>
                     </li>
                     <li class="option tool" id="circle">
                         <i class="fa-regular fa-circle"></i>
                         <span>Circle</span>
                     </li>
-                    <li class="option tool" id="triangle">
-                        <i class="fa-solid fa-mountain"></i>
-                        <span>Triangle</span>
-                    </li>
-                    <li class="option tool" id="square">
-                        <i class="far fa-square"></i>
-                        <span>Square</span>
-                    </li>
-                    <li class="option tool" id="hexagon">
-                        <i class="fa-solid fa-cube"></i>
-                        <span>Hexagon</span>
-                    </li>
-                    <li class="option tool" id="pentagon">
-                        <i class="fa-solid fa-dice-d6"></i>
-                        <span>Pentagon</span>
-                    </li>
                     <li class="option tool" id="line">
                         <i class="fa-solid fa-grip-lines"></i>
                         <span>Line</span>
                     </li>
-                    <li class="option tool" id="arrow">
-                        <i class="fa-solid fa-arrow-up"></i>
-                        <span>Arrow</span>
-                    </li>
-                    <li class="option">
-                        <input type="checkbox" id="fill-color">
-                        <label for="fill-color"> Fill Color</label>
-                    </li>
                 </ul>
             </div>
+
             <div class="row buttons">
                 <button class="clear-canvas">Clear Canvas</button>
-                <button class="save-img">Save As Image</button>
+                <button class="open-mermaid">Mermaid Editor</button>
+                <button class="save-img">Save Image</button>
             </div>
         </section>
+
+        <!-- Drawing Board -->
         <section class="drawing-board">
             <canvas></canvas>
         </section>
 
+        <!-- Mermaid Modal -->
+        <div class="mermaid-modal" id="mermaid-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Mermaid Editor</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <textarea id="mermaid-input">graph TD
+    A[Start] --> B[Process]
+    B --> C{Decision}
+    C -->|Yes| D[End]
+    C -->|No| B</textarea>
+                <button onclick="renderMermaid()">Render Diagram</button>
+                <button onclick="pasteToCanvas()">Paste to Canvas</button>
+                <div id="mermaid-output"></div>
+            </div>
+        </div>
     </div>
 
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false });
 
+        // Canvas Setup
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let selectedTool = 'brush';
+        let selectedColor = '#ff0000';
+        let brushSize = 5;
+        let startX, startY, snapshot;
+
+        // Tools
+        const tools = document.querySelectorAll('.tool');
+        const colorOptions = document.querySelectorAll('.colors .option');
+        const colorPicker = document.getElementById('color-picker');
+        const sizeSlider = document.getElementById('size-slider');
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            startX = e.offsetX;
+            startY = e.offsetY;
+            ctx.beginPath();
+            ctx.lineWidth = brushSize;
+            ctx.strokeStyle = selectedColor;
+            ctx.fillStyle = selectedColor;
+            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawing(e) {
+            if (!isDrawing) return;
+            
+            ctx.putImageData(snapshot, 0, 0);
+            
+            switch(selectedTool) {
+                case 'brush':
+                case 'pencil':
+                case 'eraser':
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                    break;
+                case 'rectangle':
+                    drawRectangle(e);
+                    break;
+                case 'circle':
+                    drawCircle(e);
+                    break;
+                case 'line':
+                    drawLine(e);
+                    break;
+            }
+        }
+
+        function drawRectangle(e) {
+            const width = e.offsetX - startX;
+            const height = e.offsetY - startY;
+            ctx.strokeRect(startX, startY, width, height);
+        }
+
+        function drawCircle(e) {
+            const radius = Math.sqrt(
+                Math.pow(e.offsetX - startX, 2) + 
+                Math.pow(e.offsetY - startY, 2)
+            );
+            ctx.beginPath();
+            ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+
+        function drawLine(e) {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        // Event Listeners
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', drawing);
+        canvas.addEventListener('mouseup', stopDraw);
+        window.addEventListener('resize', resizeCanvas);
+
+        // Tools Selection
+        tools.forEach(tool => {
+            tool.addEventListener('click', () => {
+                document.querySelector('.tool.active')?.classList.remove('active');
+                tool.classList.add('active');
+                selectedTool = tool.id;
+            });
+        });
+
+        // Color Selection
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelector('.option.selected')?.classList.remove('selected');
+                option.classList.add('selected');
+                selectedColor = option.style.backgroundColor || 
+                              option.querySelector('input')?.value || 
+                              '#000000';
+            });
+        });
+
+        colorPicker.addEventListener('input', (e) => {
+            selectedColor = e.target.value;
+        });
+
+        sizeSlider.addEventListener('input', (e) => {
+            brushSize = e.target.value;
+        });
+
+        // Buttons
+        document.querySelector('.clear-canvas').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        });
+
+        document.querySelector('.save-img').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'drawing.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        // Mermaid Functions
+        window.renderMermaid = async () => {
+            const input = document.getElementById("mermaid-input").value;
+            const output = document.getElementById("mermaid-output");
+            try {
+                const { svg } = await mermaid.render('mermaid-svg', input);
+                output.innerHTML = svg;
+            } catch (err) {
+                output.innerHTML = `<div class="error">${err.message}</div>`;
+            }
+        };
+
+        window.pasteToCanvas = () => {
+            const svg = document.getElementById("mermaid-output").innerHTML;
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+            img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+            document.getElementById('mermaid-modal').style.display = 'none';
+        };
+
+        // Modal Controls
+        document.querySelector('.open-mermaid').addEventListener('click', () => {
+            document.getElementById('mermaid-modal').style.display = 'block';
+        });
+
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            document.getElementById('mermaid-modal').style.display = 'none';
+        });
+
+        window.onclick = (event) => {
+            if (event.target === document.getElementById('mermaid-modal')) {
+                document.getElementById('mermaid-modal').style.display = 'none';
+            }
+        };
+
+        // Initial Setup
+        resizeCanvas();
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    </script>
 </body>
-
 </html>
-
