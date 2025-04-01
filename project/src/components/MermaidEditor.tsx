@@ -3,6 +3,8 @@ import mermaid from 'mermaid';
 import { Wand2 } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
+
 interface MermaidEditorProps {
   onDiagramGenerated: (svg: string) => void;
 }
@@ -52,17 +54,31 @@ export const MermaidEditor: React.FC<MermaidEditorProps> = ({ onDiagramGenerated
   const generateDiagram = async () => {
     setIsGenerating(true);
     try {
-      // This is where you would integrate with an AI service
-      // For now, we'll just add a placeholder response
-      const sampleResponse = `graph TD
-    A[User Input] --> B{Process}
-    B -- Valid --> C[Success]
-    B -- Invalid --> D[Error]
-    C --> E[Save]
-    D --> F[Retry]
-    F --> B`;
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            { role: 'system', content: 'You are an assistant that generates Mermaid.js diagrams based on user descriptions.' },
+            { role: 'user', content: `Generate a Mermaid.js diagram for: ${aiPrompt}` }
+          ],
+          temperature: 0.7,
+        }),
+      });
+
+      const data = await response.json();
+      const generatedCode = data.choices?.[0]?.message?.content?.trim() || '';
       
-      setCode(sampleResponse);
+      if (generatedCode) {
+        setCode(generatedCode);
+      } else {
+        setError('Failed to generate diagram');
+      }
+
       setAiPrompt('');
     } catch (error) {
       setError('Failed to generate diagram');
@@ -141,3 +157,4 @@ export const MermaidEditor: React.FC<MermaidEditorProps> = ({ onDiagramGenerated
     </div>
   );
 };
+
