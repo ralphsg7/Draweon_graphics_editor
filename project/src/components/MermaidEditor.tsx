@@ -3,7 +3,7 @@ import mermaid from 'mermaid';
 import { Wand2 } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 
-const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 interface MermaidEditorProps {
   onDiagramGenerated: (svg: string) => void;
