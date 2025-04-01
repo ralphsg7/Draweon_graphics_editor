@@ -5,7 +5,7 @@ Developed as part of the **Software Engineering Lab (CS3074)** coursework at the
 ## Overview
 This project provides an intuitive interface to draw, edit, and manage a variety of graphical entities. Whether you need to create geometric shapes, edit object properties, or manage complex drawings, this tool offers robust features to support your workflow.
 
-![Image1](Images/CAPTURE.png)
+![Image1](/CAPTURE.PNG)
 
 <!-- -->
 
